@@ -1,3 +1,4 @@
+
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
@@ -5,59 +6,89 @@ export default NextAuth({
   providers: [
     CredentialsProvider({
       name: 'Credentials',
+
       credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" }
+        assisstant_code: {
+          label: 'Assistant Code',
+          type: 'text',
+        },
+        password: {
+          label: 'Password',
+          type: 'password',
+        },
       },
+
       async authorize(credentials) {
-        const res = await fetch('https://boostify-back-end.vercel.app/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            assisstant_code: credentials?.username,
-            password: credentials?.password,
-          }),
-        });
+        try {
+          const res = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              assisstant_code: credentials?.assisstant_code,
+              password: credentials?.password,
+            }),
+          });
 
-        if (!res.ok) {
-          throw new Error('Invalid credentials');
+          const response = await res.json();
+          console.log("NEXTAUTH RESPONSE:", response); 
+          console.log("STATUS:", response.status); 
+          console.log("TOKEN:", response.token);
+
+          console.log('LOGIN RESPONSE:', response);
+
+          if (response.status === true) {
+            return {
+              id: response.payload.id,
+              name: response.payload.name,
+              assistantCode: response.payload.assisstant_code,
+              token: response.token,
+            };
+          }
+
+          console.log("LOGIN FAILED"); 
+          return null;
+        } catch (error) {
+          console.log('AUTH ERROR:', error);
+          return null;
         }
-
-        const user = await res.json();
-        if (user && user.token) {
-          return user; // Return user with auth token
-        }
-
-        return null;
-      }
-    })
+      },
+    }),
   ],
+
   session: {
-    jwt: true,
-    maxAge: 24 * 60 * 60, // 30 days
+    strategy: 'jwt',
+    maxAge: 24 * 60 * 60,
   },
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.token = user.token; // Auth token
         token.name = user.name;
-        token.assistantCode = user.assistant_code;
+        token.assistantCode = user.assistantCode;
+        token.token = user.token;
       }
+
       return token;
     },
+
+
     async session({ session, token }) {
-      session.user = {
-        id: token.id,
-        name: token.name,
-        assistantCode: token.assistantCode,
-        token: token.token, // Auth token
-      };
+
+      session.user.id = token.id;
+      session.user.name = token.name;
+      session.user.assistantCode = token.assistantCode;
+      session.user.token = token.token;
+
       return session;
     }
   },
+
+
   pages: {
-    signIn: '/SignIn',
-    signOut: '/SignOut',
-  }
-});
+      signIn: '/SignIn',
+    },
+  });
+

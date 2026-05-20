@@ -13,6 +13,7 @@ interface CustomUser {
   email?: string | null;
   image?: string | null;
   token?: string;
+  assistantCode?: string;
 }
 
 interface CustomSession extends DefaultSession {
@@ -34,11 +35,14 @@ const SignIn: React.FC = () => {
     setLoading(true);
     setError(null);
 
+
     const result = await signIn('credentials', {
       redirect: false,
-      username: assistantCode,
+      assisstant_code: assistantCode,
       password,
     });
+
+
 
     setLoading(false);
 
@@ -51,7 +55,7 @@ const SignIn: React.FC = () => {
         const userData = {
           id: session.user.id,
           name: session.user.name,
-          assistant_code: session.user.email,
+          assistant_code: session.user.assistantCode,
           token: session.user.token,
         };
         localStorage.setItem('authData', JSON.stringify(userData));
@@ -68,7 +72,7 @@ const SignIn: React.FC = () => {
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen pt-12 pl-10 ${isDarkMode ? 'bg-[#0D0D0D]' : 'bg-gray-100'}`}>
       <div className="mb-20">
-      <Link href="/">
+        <Link href="/">
           <Image src="/logo.png" alt="Boostify Logo" width={200} height={100} className="cursor-pointer" />
         </Link>
       </div>

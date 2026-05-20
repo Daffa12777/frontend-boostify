@@ -31,16 +31,18 @@ const LiveReport: React.FC = () => {
       const authDataString = localStorage.getItem('authData');
       if (authDataString) {
         try {
-          const authData = JSON.parse(authDataString);
-          const token = authData.token.token;
+          const authData = JSON.parse(localStorage.getItem('authData') || '{}');
 
-          const response = await fetch(`https://boostify-back-end.vercel.app/api/attendances?page=${currentPage}`, {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
+          const response = await fetch(
+            'http://localhost:3000/api/attendances?page=' + currentPage,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authData.token}`,
+              },
+            }
+          );
 
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -141,8 +143,8 @@ const LiveReport: React.FC = () => {
       </div>
       <div className="flex justify-center items-center gap-4 mb-8">
         {currentPage > 1 && (
-          <button 
-            className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer" 
+          <button
+            className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer"
             onClick={handlePreviousPage}
           >
             ◀
@@ -152,8 +154,8 @@ const LiveReport: React.FC = () => {
           PAGE {currentPage}
         </button>
         {currentPage < totalPages && (
-          <button 
-            className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer" 
+          <button
+            className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer"
             onClick={handleNextPage}
           >
             ▶

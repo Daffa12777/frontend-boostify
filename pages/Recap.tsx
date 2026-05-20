@@ -48,9 +48,9 @@ const Recap: React.FC = () => {
       if (authDataString) {
         try {
           const authData = JSON.parse(authDataString);
-          const token = authData.token.token;
+          const token = authData.token;
 
-          const response = await fetch(`https://boostify-back-end.vercel.app/api/recap?page=${currentPage}`, {
+          const response = await fetch(`http://localhost:3000/api/recap?page=${currentPage}`, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
