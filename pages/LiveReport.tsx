@@ -27,41 +27,62 @@ const LiveReport: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
-    const fetchAttendanceData = async () => {
-      const authDataString = localStorage.getItem('authData');
-      if (authDataString) {
-        try {
-          const authData = JSON.parse(localStorage.getItem('authData') || '{}');
+  const fetchAttendanceData = async () => {
+    const authDataString = localStorage.getItem('authData');
 
-          const response = await fetch(
-            'http://localhost:3000/api/attendances?page=' + currentPage,
-            {
-              method: 'GET',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${authData.token}`,
-              },
-            }
-          );
+    console.log("RAW AUTH DATA:", authDataString);
 
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
+    if (authDataString) {
+      try {
+        const authData = JSON.parse(authDataString);
 
-          const data: ApiResponse = await response.json();
-          setAttendanceData(data.assistances);
-          setTotalPages(data.totalPages);
-        } catch (error: any) {
-          console.error('Failed to fetch attendance data:', error.message);
-          setError(error.message);
-        } finally {
+        console.log("PARSED AUTH DATA:", authData);
+        console.log("TOKEN:", authData.token);
+
+        if (!authData?.token) {
+          console.error("No token found");
+          setError("No token found");
           setLoading(false);
+          return;
         }
-      }
-    };
 
-    fetchAttendanceData();
-  }, [currentPage]);
+        const response = await fetch(
+          `https://web-boostify.vercel.app/api/attendances?page=${currentPage}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authData.token}`,
+            },
+          }
+        );
+
+        console.log("RESPONSE STATUS:", response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.log("ERROR RESPONSE:", errorText);
+          throw new Error(errorText || 'Network response was not ok');
+        }
+
+        const data: ApiResponse = await response.json();
+
+        console.log("ATTENDANCE DATA:", data);
+
+        setAttendanceData(data.assistances);
+        setTotalPages(data.totalPages);
+
+      } catch (error: any) {
+        console.error('Failed to fetch attendance data:', error.message);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  fetchAttendanceData();
+}, [currentPage]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
