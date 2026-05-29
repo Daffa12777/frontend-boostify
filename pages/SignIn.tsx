@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { signIn, useSession, getSession } from 'next-auth/react';
-import Image from 'next/image'; // Import Next.js Image component
-import Link from 'next/link'; // Import Next.js Link component
+import Image from 'next/image';
+import Link from 'next/link';
 import { DefaultSession } from 'next-auth';
 import { useTheme } from '../styles/ThemeContext';
 
-// Extend the DefaultSession type to include the id and token
 interface CustomUser {
   id?: number;
   name?: string | null;
@@ -28,13 +27,12 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { isDarkMode } = useTheme();
-  const { data: session } = useSession() as { data: CustomSession | null }; // Casting to CustomSession
+  const { data: session } = useSession() as { data: CustomSession | null };
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
 
     const result = await signIn('credentials', {
       redirect: false,
@@ -42,15 +40,12 @@ const SignIn: React.FC = () => {
       password,
     });
 
-
-
     setLoading(false);
 
     if (result?.error) {
       setError('Invalid credentials');
     } else {
-      // Get the latest session after sign-in
-      const session = await getSession() as unknown as CustomSession; // Ensure type casting here
+      const session = await getSession() as unknown as CustomSession;
       if (session?.user?.token) {
         const userData = {
           id: session.user.id,
@@ -122,6 +117,12 @@ const SignIn: React.FC = () => {
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
+          <p className={`mt-2 text-sm ${isDarkMode ? 'text-[#BDBDBD]' : 'text-[#EAD196]'}`}>
+            Belum punya akun?{' '}
+            <Link href="/Register" className="font-bold underline">
+              Register
+            </Link>
+          </p>
         </form>
       </div>
     </div>
