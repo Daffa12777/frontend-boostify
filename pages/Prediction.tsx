@@ -38,28 +38,20 @@ const Prediction = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const authDataString = localStorage.getItem('authData');
-      const token = authDataString ? JSON.parse(authDataString).token.token : null;
-
-      const res = await fetch(`${API_BASE}/prediction`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      const json = await res.json();
-      if (json.success) setData(json.payload);
-      else setError(json.message || 'Gagal memuat data');
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, []);
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/prediction`);
+        const json = await res.json();
+        if (json.success) setData(json.payload);
+        else setError(json.message || 'Gagal memuat data');
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // lookup cepat: map[`${day}-${hour}`] = slot
   const map: Record<string, Slot> = {};
