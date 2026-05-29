@@ -24,7 +24,7 @@ const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Senin..Minggu
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 7); // 07:00 - 19:00
 
 // URL backend Vercel kamu
-const API_BASE = 'https://boostify-back-end.vercel.app/api';
+const API_BASE = 'https://web-boostify.vercel.app/api';
 
 const levelColor: Record<string, string> = {
   ramai: '#ef4444',
