@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import HomeNav from '../components/HomeNav';
 import Footer from '../components/Footer';
+import { useTheme } from '../styles/ThemeContext';
 
 type Slot = {
   day: number;
@@ -20,19 +21,13 @@ type Prediction = {
 };
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Senin..Minggu
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
 const HOURS = Array.from({ length: 13 }, (_, i) => i + 7); // 07:00 - 19:00
 
-// URL backend Vercel kamu
 const API_BASE = 'https://web-boostify.vercel.app/api';
 
-const levelColor: Record<string, string> = {
-  ramai: '#ef4444',
-  sedang: '#f59e0b',
-  sepi: '#86efac',
-};
-
 const Prediction = () => {
+  const { isDarkMode } = useTheme();
   const [data, setData] = useState<Prediction | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -53,88 +48,136 @@ const Prediction = () => {
     fetchData();
   }, []);
 
-  // lookup cepat: map[`${day}-${hour}`] = slot
   const map: Record<string, Slot> = {};
   data?.heatmap.forEach((s) => (map[`${s.day}-${s.hour}`] = s));
 
-  return (
-    <div>
-      <HomeNav />
-      <div style={{ padding: '24px', maxWidth: 900, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>Prediksi Keramaian Lab</h1>
-        <p style={{ color: '#6b7280', marginBottom: 24 }}>
-          Berdasarkan pola kehadiran historis (rata-rata check-in per jam &amp; hari).
-        </p>
+  // warna kotak heatmap per level
+  const cellStyle = (slot?: Slot) => {
+    if (!slot) {
+      return isDarkMode
+        ? 'bg-white/5 text-transparent'
+        : 'bg-gray-100 text-transparent';
+    }
+    if (slot.level === 'ramai') return 'bg-[#BF3131] text-white font-bold';
+    if (slot.level === 'sedang') return 'bg-[#E0A93B] text-[#5B0A0A] font-bold';
+    return 'bg-[#9ED1A1] text-[#1F5E2A] font-bold';
+  };
 
-        {loading && <p>Memuat...</p>}
-        {error && <p style={{ color: '#ef4444' }}>{error}</p>}
+  const cardBg = isDarkMode ? 'bg-[#1A1A1A] border-[#3A1010]' : 'bg-white border-gray-200';
+  const subText = isDarkMode ? 'text-gray-400' : 'text-gray-500';
+  const accent = isDarkMode ? 'text-[#EAD196]' : 'text-[#BF3131]';
+
+  const isSparse = !!data && data.totalRecords < 20;
+
+  return (
+    <div className={`min-h-screen ${isDarkMode ? 'bg-[#0D0D0D] text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <HomeNav />
+
+      <main className="max-w-5xl mx-auto px-5 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className={`text-3xl font-extrabold ${accent}`}>Prediksi Keramaian Lab</h1>
+          <p className={`mt-1 ${subText}`}>
+            Perkiraan jam ramai &amp; sepi berdasarkan pola kehadiran historis.
+          </p>
+        </div>
+
+        {loading && <p className={subText}>Memuat data...</p>}
+        {error && (
+          <div className="rounded-lg bg-red-100 text-red-700 px-4 py-3 border border-red-200">
+            {error}
+          </div>
+        )}
 
         {data && (
           <>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24 }}>
+            {/* Banner kalau data masih sedikit */}
+            {isSparse && (
+              <div className={`mb-6 rounded-xl px-4 py-3 text-sm border ${
+                isDarkMode
+                  ? 'bg-[#3A2A0A] border-[#5C4410] text-[#EAD196]'
+                  : 'bg-[#FFF8E6] border-[#EAD196] text-[#7A5A0A]'
+              }`}>
+                Data kehadiran masih sedikit (<b>{data.totalRecords} record</b>), jadi prediksinya
+                belum mewakili pola sebenarnya. Heatmap akan makin akurat seiring bertambahnya absensi.
+              </div>
+            )}
+
+            {/* Kartu Jam Tersibuk */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
               {data.busiest.map((b, i) => (
-                <div key={i} style={{ padding: '12px 16px', borderRadius: 10, background: '#f3f4f6' }}>
-                  <div style={{ fontSize: 12, color: '#6b7280' }}>Jam Tersibuk #{i + 1}</div>
-                  <div style={{ fontWeight: 700 }}>{b.label}</div>
-                  <div style={{ fontSize: 12 }}>~{b.avgCheckins} orang</div>
+                <div key={i} className={`rounded-xl border p-4 ${cardBg}`}>
+                  <div className={`text-xs uppercase tracking-wide ${subText}`}>
+                    Jam Tersibuk #{i + 1}
+                  </div>
+                  <div className={`mt-1 text-xl font-bold ${accent}`}>{b.label}</div>
+                  <div className={`text-sm ${subText}`}>± {b.avgCheckins} orang</div>
                 </div>
               ))}
             </div>
 
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                <thead>
-                  <tr>
-                    <th style={{ padding: 6, fontSize: 12 }}></th>
-                    {HOURS.map((h) => (
-                      <th key={h} style={{ padding: 6, fontSize: 11, color: '#6b7280' }}>
-                        {String(h).padStart(2, '0')}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {DAY_ORDER.map((d, idx) => (
-                    <tr key={d}>
-                      <td style={{ padding: 6, fontSize: 12, fontWeight: 600 }}>{DAYS[idx]}</td>
-                      {HOURS.map((h) => {
-                        const slot = map[`${d}-${h}`];
-                        return (
-                          <td
-                            key={h}
-                            title={slot ? `${slot.avgCheckins} orang (${slot.level})` : 'tidak ada data'}
-                            style={{
-                              width: 34,
-                              height: 30,
-                              textAlign: 'center',
-                              fontSize: 10,
-                              borderRadius: 4,
-                              background: slot ? levelColor[slot.level] : '#f9fafb',
-                              color: slot && slot.level === 'sepi' ? '#166534' : '#fff',
-                            }}
-                          >
-                            {slot ? slot.avgCheckins : ''}
-                          </td>
-                        );
-                      })}
+            {/* Heatmap */}
+            <div className={`rounded-2xl border p-5 ${cardBg}`}>
+              <h2 className="text-lg font-bold mb-4">Pola Kehadiran per Jam</h2>
+              <div className="overflow-x-auto">
+                <table className="border-separate" style={{ borderSpacing: '4px' }}>
+                  <thead>
+                    <tr>
+                      <th className="w-16"></th>
+                      {HOURS.map((h) => (
+                        <th key={h} className={`text-xs font-medium pb-1 ${subText}`}>
+                          {String(h).padStart(2, '0')}
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {DAY_ORDER.map((d, idx) => (
+                      <tr key={d}>
+                        <td className="text-sm font-semibold pr-2 whitespace-nowrap">{DAYS[idx]}</td>
+                        {HOURS.map((h) => {
+                          const slot = map[`${d}-${h}`];
+                          return (
+                            <td key={h} className="p-0">
+                              <div
+                                title={slot ? `${DAYS[idx]} ${h}:00 — ${slot.avgCheckins} orang (${slot.level})` : 'Tidak ada data'}
+                                className={`w-9 h-9 flex items-center justify-center rounded-md text-[11px] transition-transform hover:scale-110 ${cellStyle(slot)}`}
+                              >
+                                {slot ? slot.avgCheckins : '·'}
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            <div style={{ display: 'flex', gap: 16, marginTop: 16, fontSize: 12 }}>
-              <span><span style={{ background: levelColor.ramai, padding: '2px 8px', borderRadius: 4, color: '#fff' }}>Ramai</span></span>
-              <span><span style={{ background: levelColor.sedang, padding: '2px 8px', borderRadius: 4, color: '#fff' }}>Sedang</span></span>
-              <span><span style={{ background: levelColor.sepi, padding: '2px 8px', borderRadius: 4, color: '#166534' }}>Sepi</span></span>
-            </div>
+              {/* Legend */}
+              <div className="flex flex-wrap items-center gap-4 mt-5 text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-[#BF3131] inline-block" /> Ramai
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-[#E0A93B] inline-block" /> Sedang
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 rounded bg-[#9ED1A1] inline-block" /> Sepi
+                </span>
+                <span className={`flex items-center gap-2 ${subText}`}>
+                  <span className={`w-4 h-4 rounded inline-block ${isDarkMode ? 'bg-white/5' : 'bg-gray-100'}`} /> Tidak ada data
+                </span>
+              </div>
 
-            <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 16 }}>
-              Total {data.totalRecords} record kehadiran dianalisis.
-            </p>
+              <p className={`mt-4 text-xs ${subText}`}>
+                Total {data.totalRecords} record kehadiran dianalisis · angka = rata-rata orang per jam.
+              </p>
+            </div>
           </>
         )}
-      </div>
+      </main>
+
       <Footer />
     </div>
   );
