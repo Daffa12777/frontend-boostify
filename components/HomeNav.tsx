@@ -126,6 +126,13 @@ const HomeNav: React.FC = () => {
               </Link>
             </li>
             <li className="w-full text-center md:w-auto">
+              <Link href="/Prediction" passHref>
+                <span className={`font-medium ${isDarkMode ? 'text-[#EAD196]' : 'text-red-700'}`}>
+                  Prediksi
+                </span>
+              </Link>
+            </li>
+            <li className="w-full text-center md:w-auto">
               <button onClick={() => setShowPopup(true)} className={`font-bold ${isDarkMode ? 'text-[#EAD196]' : 'text-red-700'}`}>
                 Sign Out
               </button>
