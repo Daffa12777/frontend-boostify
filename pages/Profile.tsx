@@ -69,7 +69,7 @@ const Profile: React.FC = () => {
           const token = authData.token.token;
 
           const formData = new FormData();
-          formData.append('image', file); // Match the key expected by multer
+          formData.append('image', file);
 
           const response = await fetch('https://boostify-back-end.vercel.app/api/uploadImage', {
             method: 'PATCH',
@@ -91,7 +91,7 @@ const Profile: React.FC = () => {
             if (!prevState) return null;
             return {
               ...prevState,
-              image_url: updatedImageUrl, // Use the updated image URL
+              image_url: updatedImageUrl,
             };
           });
           setProfileImage(updatedImageUrl);
@@ -126,7 +126,7 @@ const Profile: React.FC = () => {
           if (!prevState) return null;
           return {
             ...prevState,
-            image_url: '/user.png', // Reset to default image after deletion
+            image_url: '/user.png',
           };
         });
         setShowModal(false);
@@ -142,9 +142,9 @@ const Profile: React.FC = () => {
       try {
         const authData = JSON.parse(authDataString);
         const token = authData.token.token;
-  
-        console.log('Fetching attendance data with token:', token); // Debugging line
-  
+
+        console.log('Fetching attendance data with token:', token);
+
         const response = await fetch('https://boostify-back-end.vercel.app/api/personalrec', {
           method: 'GET',
           headers: {
@@ -152,24 +152,24 @@ const Profile: React.FC = () => {
             'Content-Type': 'application/json',
           },
         });
-  
+
         if (!response.ok) {
           if (response.status === 404) {
-            setAttendanceData([]); // Set to an empty array to display "No attendance history available"
+            setAttendanceData([]);
           } else {
             const errorText = await response.text();
             throw new Error(`Network response was not ok: ${response.status} ${errorText}`);
           }
         } else {
           const data = await response.json();
-          console.log('Attendance data received:', data); // Debugging line
+          console.log('Attendance data received:', data);
           setAttendanceData(data.attendancesTime || []);
         }
       } catch (error: any) {
         console.error('Failed to fetch attendance data:', error.message);
       }
     }
-  };  
+  };
 
   useEffect(() => {
     fetchUserData();
@@ -183,25 +183,29 @@ const Profile: React.FC = () => {
         <div className={`flex flex-col items-center mb-10 ${isDarkMode ? 'text-white' : 'text-black'}`}>
           <div className="relative flex flex-col items-center">
             <div className="bg-yellow-100 w-36 h-36 sm:w-48 sm:h-48 rounded-full flex items-center justify-center overflow-hidden mt-8 sm:mt-12">
-              <Image 
-                src={profileImage} 
-                alt="User Avatar" 
-                width={100} 
-                height={100} 
-                className="object-cover w-full h-full" 
+              <Image
+                src={profileImage}
+                alt="User Avatar"
+                width={100}
+                height={100}
+                className="object-cover w-full h-full"
               />
             </div>
-            <Image 
-              src={isDarkMode ? "/pencil-dark.png" : "/pencil-light.png"} 
-              alt="Edit Profile" 
-              width={40}  // You can adjust this value
-              height={40} // You can adjust this value
-              className="absolute bottom-4 right-0 cursor-pointer sm:w-10 sm:h-10 aspect-square" 
-              onClick={() => setShowModal(true)} 
+            <Image
+              src={isDarkMode ? "/pencil-dark.png" : "/pencil-light.png"}
+              alt="Edit Profile"
+              width={40}
+              height={40}
+              className="absolute bottom-4 right-0 cursor-pointer sm:w-10 sm:h-10 aspect-square"
+              onClick={() => setShowModal(true)}
             />
           </div>
-          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 my-4 sm:my-5">{profileData?.assisstant_code || 'N/A'}</h2>
-          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800">{profileData?.name || 'Loading...'}</h1>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-700 my-4 sm:my-5">
+            {profileData?.assisstant_code || 'N/A'}
+          </h2>
+          <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-gray-800">
+            {profileData?.name || 'Loading...'}
+          </h1>
         </div>
         <section className="mt-8 sm:mt-12">
           <h2 className="font-bold text-xl sm:text-2xl mb-6 sm:mb-8">Attendance History</h2>
@@ -226,17 +230,21 @@ const Profile: React.FC = () => {
             </button>
             <h3 className="mb-2 text-base sm:text-lg font-bold text-gray-800">Edit Profile Picture</h3>
             <label className="inline-block py-1 px-2 bg-[#D7B66A] text-[#7D0A0A] rounded cursor-pointer mb-2">
-              <input 
-                type="file" 
-                accept="image/jpeg,image/jpg,image/png,image/heic" 
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/heic"
                 onChange={handleFileChange}
-                className="hidden" 
+                className="hidden"
               />
               Choose File
             </label>
             <div className="flex justify-between mt-4">
-              <button className="py-1 px-3 bg-[#7D0A0A] text-[#D7B66A] rounded font-bold" onClick={handleDeleteImage}>Delete Image</button>
-              <button className="py-1 px-3 bg-[#D7B66A] text-[#7D0A0A] rounded font-bold" onClick={() => setShowModal(false)}>Upload</button>
+              <button className="py-1 px-3 bg-[#7D0A0A] text-[#D7B66A] rounded font-bold" onClick={handleDeleteImage}>
+                Delete Image
+              </button>
+              <button className="py-1 px-3 bg-[#D7B66A] text-[#7D0A0A] rounded font-bold" onClick={() => setShowModal(false)}>
+                Upload
+              </button>
             </div>
           </div>
         </div>
