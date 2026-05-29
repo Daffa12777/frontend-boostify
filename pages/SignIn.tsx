@@ -28,7 +28,7 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { isDarkMode } = useTheme();
-  const { data: session } = useSession() as { data: CustomSession }; // Casting to CustomSession
+  const { data: session } = useSession() as { data: CustomSession | null }; // Casting to CustomSession
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
