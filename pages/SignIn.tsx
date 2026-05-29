@@ -50,7 +50,7 @@ const SignIn: React.FC = () => {
       setError('Invalid credentials');
     } else {
       // Get the latest session after sign-in
-      const session = await getSession() as CustomSession; // Ensure type casting here
+      const session = await getSession() as unknown as CustomSession; // Ensure type casting here
       if (session?.user?.token) {
         const userData = {
           id: session.user.id,
