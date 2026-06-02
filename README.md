@@ -1,54 +1,148 @@
-# boostify-test
+# 🐝 Boostify — Frontend
 
-🎉 Congratulations, your project was successfully generated with [Create Next Stack](https://www.create-next-stack.com/)!
+Tampilan web untuk sistem absensi otomatis berbasis pengenalan wajah **Boostify**.
 
-To get started, run:
+🔗 **Live:** [frontend-boostify.vercel.app](https://frontend-boostify.vercel.app)
+
+---
+
+## ✨ Fitur
+
+- 🔐 Login dengan kode asisten & password
+- 📝 Register akun baru
+- 👤 Halaman profil (foto, kode, nama)
+- 📸 Upload & hapus foto profil
+- 📋 Riwayat absensi pribadi
+- 📊 Live report absensi realtime
+- 📈 Recap & prediksi absensi
+- 🌙 Dark mode / Light mode
+
+---
+
+## 🛠️ Teknologi
+
+| Teknologi | Fungsi |
+|---|---|
+| Next.js 14 | Framework utama |
+| TypeScript | Bahasa pemrograman |
+| Tailwind CSS | Styling |
+| NextAuth.js | Autentikasi |
+| Framer Motion | Animasi |
+
+---
+
+## 📁 Struktur Folder
+
+```
+BOOSTIFY-FrontEnd/
+├── pages/
+│   ├── api/auth/
+│   │   └── [...nextauth].js   ← konfigurasi NextAuth
+│   ├── _app.tsx               ← entry point
+│   ├── index.tsx              ← landing page
+│   ├── SignIn.tsx             ← halaman login
+│   ├── Register.tsx           ← halaman register
+│   ├── HomePage.tsx           ← dashboard
+│   ├── Profile.tsx            ← profil pengguna
+│   ├── LiveReport.tsx         ← laporan realtime
+│   ├── Recap.tsx              ← rekap absensi
+│   ├── Prediction.tsx         ← prediksi absensi
+│   ├── About.tsx              ← halaman about
+│   └── Team.tsx               ← halaman tim
+│
+├── components/
+│   ├── HomeNav.tsx            ← navbar
+│   └── Footer.tsx             ← footer
+│
+├── styles/
+│   ├── globals.css
+│   └── ThemeContext.tsx       ← dark/light mode
+│
+├── declarations.d.ts          ← type tambahan NextAuth
+└── middleware.ts              ← proteksi halaman
+```
+
+---
+
+## 🚀 Cara Menjalankan (Lokal)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/Daffa12777/frontend-boostify.git
+cd frontend-boostify
+npm install
+```
+
+### 2. Buat File `.env.local`
+
+```env
+NEXTAUTH_SECRET=isi_dengan_random_string
+NEXTAUTH_URL=http://localhost:3001
+```
+
+> Generate secret: `openssl rand -base64 32`
+
+### 3. Jalankan
 
 ```bash
 npm run dev
 ```
 
-## Final Steps
+Buka di browser: [http://localhost:3001](http://localhost:3001)
 
-There are a few final steps that we were not able to perform automatically. We have provided a complete list for you below. You should take care of these before you can start developing your project. You can delete each item from the list as you go along.
+---
 
-### To do:
+## 🔐 Cara Login
 
-- Integrate Vercel with your repository host for continuous deployments at https://vercel.com/new
+1. Buka halaman Sign In
+2. Masukkan **Kode Asisten** (contoh: `FDR`)
+3. Masukkan **Password**
+4. Klik Sign In
 
-## Scripts
+> Belum punya akun? Klik **Register** di halaman Sign In.
 
-The table below provides names and descriptions of the npm scripts available in this project.
+---
 
-Each script is run using `npm run <script-name>`. For example: `npm run dev`.
+## 🌐 Environment Variables (Vercel)
 
-| Name            | Description                                                                    |
-| --------------- | ------------------------------------------------------------------------------ |
-| `test`          | Runs tests                                                                     |
-| `dev`           | Runs the Next.js development server.                                           |
-| `build`         | Generates a production build.                                                  |
-| `start`         | Runs the Next.js production server built using `build` script.                 |
-| `lint`          | Runs [ESLint](https://eslint.org/) to catch linting errors in the source code. |
-| `format`        | Formats all source code in the project.                                        |
-| `format:check`  | Checks the formatting of all code in the project.                              |
-| `deploy:vercel` | Deploy a preview deployment to Vercel                                          |
+| Variable | Nilai |
+|---|---|
+| `NEXTAUTH_SECRET` | Random string (generate pakai openssl) |
+| `NEXTAUTH_URL` | `https://frontend-boostify.vercel.app` |
 
-## Technologies
+---
 
-The table below gives an overview of the technologies used in this project, as well as places to learn more about them.
+## 📡 Koneksi ke Backend
 
-| Name            | Links                                                                                                                                                                                                           |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Next.js         | [Website](https://nextjs.org/) - [Docs](https://nextjs.org/docs) - [Learn Next.js](https://nextjs.org/learn) - [GitHub](https://github.com/vercel/next.js) - [Wikipedia](https://en.wikipedia.org/wiki/Next.js) |
-| React           | [Website](https://reactjs.org/) - [Docs](https://reactjs.org/docs/getting-started.html) - [GitHub](https://github.com/facebook/react) - [Wikipedia](<https://en.wikipedia.org/wiki/React_(JavaScript_library)>) |
-| TypeScript      | [Website](https://www.typescriptlang.org/) - [Docs](https://www.typescriptlang.org/docs/) - [GitHub](https://github.com/microsoft/TypeScript) - [Wikipedia](https://en.wikipedia.org/wiki/TypeScript)           |
-| Tailwind CSS    | [Website](https://tailwindcss.com/) - [Docs](https://tailwindcss.com/docs) - [GitHub](https://github.com/tailwindlabs/tailwindcss)                                                                              |
-| Framer Motion   | [Website](https://www.framer.com/motion/) - [Docs](https://www.framer.com/docs/) - [GitHub](https://github.com/framer/motion)                                                                                   |
-| React Hook Form | [Website](https://react-hook-form.com/) - [Docs](https://react-hook-form.com/get-started) - [GitHub](https://github.com/react-hook-form/react-hook-form)                                                        |
-| React Query     | [Website](https://tanstack.com/query/latest) - [Docs](https://tanstack.com/query/latest/docs/react/overview) - [GitHub](https://github.com/tanstack/query)                                                      |
-| React Icons     | [Website](https://react-icons.github.io/react-icons/) - [GitHub](https://github.com/react-icons/react-icons)                                                                                                    |
-| ESLint          | [Website](https://eslint.org/) - [Configuration](https://eslint.org/docs/user-guide/configuring/) - [Rules](https://eslint.org/docs/rules/) - [GitHub](https://github.com/eslint/eslint)                        |
-| Prettier        | [Website](https://prettier.io/) - [Docs](https://prettier.io/docs/en/index.html) - [Options](https://prettier.io/docs/en/options.html) - [GitHub](https://github.com/prettier/prettier)                         |
-| npm             | [Website](https://www.npmjs.com/) - [Docs](https://docs.npmjs.com/) - [GitHub](https://github.com/npm/cli)                                                                                                      |
-| GitHub Actions  | [Website](https://github.com/features/actions) - [Docs](https://docs.github.com/en/actions) - [Workflow syntax](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions)                |
-| Vercel          | [Website](https://vercel.com/) - [Docs](https://vercel.com/docs) - [CLI Docs](https://vercel.com/docs/cli)                                                                                                      |
+Frontend terhubung ke backend di:
+
+```
+https://web-boostify.vercel.app
+```
+
+Endpoint yang dipakai:
+
+| Endpoint | Fungsi |
+|---|---|
+| `POST /api/auth/login` | Login |
+| `POST /api/auth/register` | Register |
+| `GET /api/whoami` | Data profil |
+| `GET /api/personalrec` | Riwayat absensi |
+| `PATCH /api/uploadImage` | Upload foto profil |
+| `DELETE /api/deleteImage` | Hapus foto profil |
+| `GET /api/attendances` | Live report |
+| `GET /api/recap` | Rekap absensi |
+
+---
+
+## 🔗 Repository Terkait
+
+| Repo | Link |
+|---|---|
+| Backend | [github.com/Daffa12777/web-boostify](https://github.com/Daffa12777/web-boostify) |
+| ML | [github.com/Daffa12777/boostify-ml](https://github.com/Daffa12777/boostify-ml) |
+
+---
+
+*Boostify — Smart Attendance for Smart Campus* 🐝
