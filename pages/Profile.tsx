@@ -147,9 +147,9 @@ const Profile: React.FC = () => {
   }, [session]);
 
   return (
-    <div className={`max-w-7xl mx-auto ${isDarkMode ? 'bg-[#0D0D0D] text-white' : 'bg-white text-black'}`}>
+    <div className={isDarkMode ? 'bg-[#0D0D0D] text-white' : 'bg-white text-black'}>
       <HomeNav />
-      <main className="px-4 py-10">
+      <main className="max-w-7xl mx-auto px-4 py-10">
         <div className={`flex flex-col items-center mb-10 ${isDarkMode ? 'text-white' : 'text-black'}`}>
           <div className="relative flex flex-col items-center">
             <div className="bg-yellow-100 w-36 h-36 sm:w-48 sm:h-48 rounded-full flex items-center justify-center overflow-hidden mt-8 sm:mt-12">

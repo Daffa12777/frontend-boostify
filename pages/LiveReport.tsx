@@ -27,62 +27,64 @@ const LiveReport: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
-  const fetchAttendanceData = async () => {
-    const authDataString = localStorage.getItem('authData');
+    const fetchAttendanceData = async () => {
+      const authDataString = localStorage.getItem('authData');
 
-    console.log("RAW AUTH DATA:", authDataString);
+      console.log("RAW AUTH DATA:", authDataString);
 
-    if (authDataString) {
-      try {
-        const authData = JSON.parse(authDataString);
+      if (authDataString) {
+        try {
+          const authData = JSON.parse(authDataString);
 
-        console.log("PARSED AUTH DATA:", authData);
-        console.log("TOKEN:", authData.token);
+          console.log("PARSED AUTH DATA:", authData);
+          console.log("TOKEN:", authData.token);
 
-        if (!authData?.token) {
-          console.error("No token found");
-          setError("No token found");
-          setLoading(false);
-          return;
-        }
-
-        const response = await fetch(
-          `https://web-boostify.vercel.app/api/attendances?page=${currentPage}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authData.token}`,
-            },
+          if (!authData?.token) {
+            console.error("No token found");
+            setError("No token found");
+            setLoading(false);
+            return;
           }
-        );
 
-        console.log("RESPONSE STATUS:", response.status);
+          const response = await fetch(
+            `https://web-boostify.vercel.app/api/attendances?page=${currentPage}`,
+            {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${authData.token}`,
+              },
+            }
+          );
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.log("ERROR RESPONSE:", errorText);
-          throw new Error(errorText || 'Network response was not ok');
+          console.log("RESPONSE STATUS:", response.status);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.log("ERROR RESPONSE:", errorText);
+            throw new Error(errorText || 'Network response was not ok');
+          }
+
+          const data: ApiResponse = await response.json();
+
+          console.log("ATTENDANCE DATA:", data);
+
+          setAttendanceData(data.assistances);
+          setTotalPages(data.totalPages);
+
+        } catch (error: any) {
+          console.error('Failed to fetch attendance data:', error.message);
+          setError(error.message);
+        } finally {
+          setLoading(false);
         }
-
-        const data: ApiResponse = await response.json();
-
-        console.log("ATTENDANCE DATA:", data);
-
-        setAttendanceData(data.assistances);
-        setTotalPages(data.totalPages);
-
-      } catch (error: any) {
-        console.error('Failed to fetch attendance data:', error.message);
-        setError(error.message);
-      } finally {
+      } else {
         setLoading(false);
       }
-    }
-  };
+    };
 
-  fetchAttendanceData();
-}, [currentPage]);
+    fetchAttendanceData();
+  }, [currentPage]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -116,72 +118,84 @@ const LiveReport: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return <div className="text-center mt-4">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center mt-4 text-red-500">Error: {error}</div>;
-  }
-
   const handleDateChange = (date: Date | null) => {
     setSelectedDate(date);
     // Add logic here to filter attendanceData based on selectedDate
   };
 
-  const currentDate = selectedDate || new Date();
+  if (loading) {
+    return (
+      <div>
+        <HomeNav />
+        <div className="text-center my-24">Loading...</div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <HomeNav />
+        <div className="text-center my-24 text-red-500">Error: {error}</div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-screen-xl mx-auto">
+    <div>
       <HomeNav />
-      <h1 className="text-5xl font-bold text-center text-gray-600 my-24">ATTENDANCE</h1>
-      <div className="flex items-center justify-center gap-4 mb-8 text-center">
-        <label htmlFor="date-picker" className="text-center text-xl text-gray-700">
-          Select Date:
-        </label>
-        <DatePicker
-          id="date-picker"
-          selected={selectedDate}
-          onChange={handleDateChange}
-          className="p-2 text-lg border rounded-lg border-gray-300"
-          dateFormat="dd/MM/yyyy"
-          placeholderText="Click to select a date"
-        />
-      </div>
-      <div className="flex flex-col items-center gap-5 mb-8">
-        {attendanceData.map((item) => (
-          <div key={item.id} className="bg-[#EAD196] p-5 rounded-lg w-full max-w-3xl flex justify-between items-center shadow-md">
-            <div className="flex-1 mr-5 text-left">
-              <div className="text-2xl font-bold mb-1">{item.assisstant_code}</div>
-              <div className="text-lg text-gray-800">{item.name}</div>
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-8">
+        <h1 className="text-5xl font-bold text-center text-gray-600 my-24">ATTENDANCE</h1>
+        <div className="flex items-center justify-center gap-4 mb-8 text-center">
+          <label htmlFor="date-picker" className="text-center text-xl text-gray-700">
+            Select Date:
+          </label>
+          <DatePicker
+            id="date-picker"
+            selected={selectedDate}
+            onChange={handleDateChange}
+            className="p-2 text-lg border rounded-lg border-gray-300"
+            dateFormat="dd/MM/yyyy"
+            placeholderText="Click to select a date"
+          />
+        </div>
+        <div className="flex flex-col items-center gap-5 mb-8">
+          {attendanceData.map((item) => (
+            <div key={item.id} className="bg-[#EAD196] p-5 rounded-lg w-full max-w-3xl flex justify-between items-center shadow-md">
+              <div className="flex-1 mr-5 text-left">
+                <div className="text-2xl font-bold mb-1">{item.assisstant_code}</div>
+                <div className="text-lg text-gray-800">{item.name}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-lg font-bold">{formatDate(item.time)}</div>
+                <div className="text-md font-bold">{formatTime(item.time)}</div>
+              </div>
             </div>
-            <div className="text-right">
-              <div className="text-lg font-bold">{formatDate(item.time)}</div>
-              <div className="text-md font-bold">{formatTime(item.time)}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="flex justify-center items-center gap-4 mb-8">
-        {currentPage > 1 && (
-          <button
-            className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer"
-            onClick={handlePreviousPage}
-          >
-            ◀
+          ))}
+        </div>
+        <div className="flex justify-center items-center gap-4 mb-8">
+          {currentPage > 1 && (
+            <button
+              className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer"
+              onClick={handlePreviousPage}
+            >
+              ◀
+            </button>
+          )}
+          <button className="bg-[#7D0A0A] text-[#EAD196] px-4 py-2 rounded-lg font-bold" disabled>
+            PAGE {currentPage}
           </button>
-        )}
-        <button className="bg-[#7D0A0A] text-[#EAD196] px-4 py-2 rounded-lg font-bold" disabled>
-          PAGE {currentPage}
-        </button>
-        {currentPage < totalPages && (
-          <button
-            className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer"
-            onClick={handleNextPage}
-          >
-            ▶
-          </button>
-        )}
+          {currentPage < totalPages && (
+            <button
+              className="bg-[#7D0A0A] text-[#EAD196] p-2 rounded-lg text-lg cursor-pointer"
+              onClick={handleNextPage}
+            >
+              ▶
+            </button>
+          )}
+        </div>
       </div>
       <Footer />
     </div>
